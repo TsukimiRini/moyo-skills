@@ -1,0 +1,38 @@
+# Schema for 世界观 (world/worldview.md or world/worldview.yaml).
+# World docs in 文游 projects often look like a markdown doc with three sections:
+#   1. 概述: 一段散文 (这是个什么样的游戏 / 世界 + 玩家在其中的位置)
+#   2. 主要角色介绍: 一段段写每个 NPC (表面 vs 内核 + 怎么跟玩家相遇). 这是 short blurbs;
+#      完整人设在 characters/<name>/ 下.
+#   3. 核心规则: runtime 行为规则 (好感度 / 一致性 / 文学风格 / NPC 表现合理性 / 互动逻辑 / etc.)
+#
+# 如果你的项目世界设定本身比较"硬"(科技 / 魔法体系 / 阶级 / 时代), 在 1 之后再加一段
+# "世界设定" 写规则; 但 character-driven 项目通常不需要太多.
+#
+# 这是 markdown 友好结构, 因为 runtime 注入时整段拼即可. YAML frontmatter 也行,
+# 但 narrative 内容用 markdown 章节更自然. 选你顺手的.
+
+example_structure:
+  overview: |
+    一段散文, 200-400 字.
+    讲清这是个什么样的游戏 / 世界, 玩家(玩家姓名{{player_name}})的身份和起点位置.
+
+  main_characters: # 一段段, 每段 100-200 字
+    - name: <角色名>
+      surface: 一句话外表 / 公众形象
+      core: 一句话内核 (玩家会逐渐看到的)
+      hook: 跟玩家如何相遇 / 课堂 / 社团 / 偶遇
+    # 完整人设在 characters/<name>/00_core.yaml
+
+  core_rules: # runtime 行为规则
+    - 世界观中的一些核心规则，因各游戏而异
+
+  # 可选: 世界设定硬规则, 如果项目需要
+  # world_rules:
+  #   - 时代基调
+  #   - 科技 / 魔法 / 政治 怎么运作
+  #   - 主要阵营
+  #   - 地理 / 时间线
+
+# 重 lore (某个组织内部架构 / 神器历史) 单独写在 world/lore_<topic>.md, runtime 按需注入.
+
+# Token budget: worldview 主文件 ≤ 1500 (因为 main_characters 占空间). 太长就拆.

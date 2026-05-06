@@ -1,0 +1,84 @@
+# Schema for 核心人设 (characters/<name>/00_core.yaml).
+# Only the COMMON fields. Project-specific extensions (e.g. <feature>_tactics, *_protocol,
+# *_mechanism, *_scenarios) are encouraged but unique per project — don't try to schematize them.
+#
+# Reminder: this YAML is injected into runtime LLM prompts. Write behavior-anchored, present-tense,
+# token-tight content (see references/style_guide.md).
+#
+# All blocks below are conventional but optional except base_info. Skip what doesn't apply.
+
+base_info:
+  name: 角色名
+  title: ["称号 1", "称号 2"]      # 第三方对他的称号 / 标签
+  identity: 身份背景，包括跟玩家的关系起点
+  age: 年龄 (字符串以兼容 "约 20" / "?-23" 这种)
+  extra: 任何关键设定，无法塞入上面字段的
+
+life_story:                       # 视角色重要程度可选；分阶段写
+  childhood:                      # 0-6 / 童年
+    - bullet point
+  adolescence:                    # 7-14 / 少年期
+    - bullet point
+  youth:                          # 15-22 / 青年期 (按角色年龄裁剪 / 命名)
+    - bullet point
+  # 年龄段 keys 可以加 "(0~6 岁)" 这种括号注释, 也可以省
+
+present:                          # 当前状态 — runtime LLM 演这个角色时的"此刻"
+  current_state: 当前正在做什么 / 处于什么阶段
+  personality:
+    tags: 短词标签字符串            # 例 "海王、毒舌、傲娇任性、姐控"
+    external_personality: 对外形象 (他人眼中)
+    internal_personality: 内在真实 (玩家会逐渐看到)
+    traits:                       # 行为锚定的特质，每条解释清楚"怎么个 X 法"
+      - "<标签>：<具体怎么表现>，<在什么情境下出现>"
+    likes:
+      - 偏好 1
+    dislikes:
+      - 厌恶 1
+    deep-rooted fears:           # 深层恐惧
+      - 恐惧 1
+    details:                     # 其他重要细节
+      - 细节 1
+    weaknesses:
+      - 弱点 1
+  habits:                        # 行为 / 思维习惯
+    - 习惯 1
+  physique:                      # 体型相关
+    height: 180cm
+    weight: 70kg
+    hands: 手型描述
+    description: 身材整体描述
+  appearance:                    # 五官 / 长相
+    hair: 发色 + 发型
+    eyes: 眼睛
+    lips: 嘴 (可选)
+    skin: 皮肤 (可选)
+    face: 脸型 / 表情常态
+    features:                    # 标志性特征 (耳钉 / 眼镜 / 习惯性表情)
+      - 特征 1
+  attire:                        # 日常穿着
+    - 风格描述
+  voice: 声音 (音质 / 语速 / 语气)
+  scent: 体味 / 香水 (可选)
+
+# 恋爱观，对 romance-driven 项目通常必填
+love_outlook:
+  - bullet point
+
+# R18 ≥ medium 时填
+sexual_experience:
+  - bullet point
+sexual_quirks_and_habits:
+  - bullet point
+
+# ─────────────────────────────────────────────────────────────────────────
+# 项目专属段落 (free-form extensions)
+# ─────────────────────────────────────────────────────────────────────────
+# 不要试图把每个角色的所有细节塞进上面的 common 字段. 角色都有"独特机制":
+#   - 一个心机型角色可能需要 manipulation_tactics / seduction_patterns
+#   - 一个 meta 自觉角色可能需要 fourth_wall_breaking_protocol
+#   - 一个 BDSM 倾向角色可能需要 power_dynamic_preferences
+#   - 不同角色独特的部分各不相同
+# 这些专属段落自由命名 (建议动词锚定: *_tactics / *_behavior / *_protocol /
+# *_mechanism / *_scenarios / *_patterns), 加在 00_core.yaml 末尾即可.
+# 不要把它们写进 common schema, 因为它们因角色而异.
