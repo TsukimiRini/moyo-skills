@@ -116,6 +116,8 @@ template = '<div>{{variable}}</div>'
 - 箭头等 Unicode 字符在 iOS 上可能渲染为 emoji，加 `&#xFE0E;` 强制文本渲染
 - 纯 UI 逻辑（翻页、滚动、模态框开关）可直接写在 `<script>` 标签里
 
+**多帧视觉小说界面**（每帧含多个媒体变量、多角色立绘、帧级副作用）的高级模式见 `references/advanced-html-patterns.md`，包含：`#script-data` 隐藏容器、跨帧状态继承、帧级副作用触发、多角色立绘。
+
 ---
 
 ## 组件二：嵌套提取规则（ResponseFormat）
@@ -173,6 +175,63 @@ occurrence = 'multiple'
 - `template` 中属性值里的双引号需转义为 `\"`
 
 > `replace` 会销毁旧节点，导致绑定在其上的事件监听器和 MutationObserver 失效。与内嵌 JS 混用时的陷阱和解法见 `references/advanced-triggers.md`。
+
+---
+
+## 媒体变量（Media Variables）
+
+媒体变量将一个普通变量与素材库中的图片/音频/视频绑定，引擎渲染时自动把变量值解析为素材 URL 注入 HTML。
+
+**命名规范**：所有媒体变量**必须以 `_asset` 结尾**，没有例外。
+
+```
+portrait_asset   ✅      portrait        ❌
+gp_track_asset   ✅      gp_track_image  ❌
+bgm_asset        ✅      bgm_track       ❌
+```
+
+嵌套捕获组同样适用，捕获组名本身要以 `_asset` 结尾：
+
+```toml
+[response_format.nested_extraction.nested_layers.dialogue_list]
+regex = '【(?<speaker>[^|】]+)\|(?<portrait_asset>[^】]*)】\s*(?<content>[\s\S]*?)(?=【|$)'
+occurrence = 'multiple'
+```
+
+### 在 HTML 中声明媒体占位符
+
+引擎支持三种注入方式：
+
+**方式一：直接作为 src**（最常见）
+```html
+<img id="bg-image" src="{{gp_track_asset}}" class="bg-layer" />
+<audio id="bgm" src="{{bgm_asset}}" autoplay loop></audio>
+```
+
+**方式二：CSS background-image**
+```html
+<div style="background-image: url({{card_bg_asset}})"></div>
+```
+
+**方式三：data 属性 + JS 读取**（适合需要 JS 动态切换的场景，如翻页立绘）
+```html
+<div class="story-line" data-portrait-asset="{{dialogue_list.portrait_asset}}">...</div>
+```
+```javascript
+const url = currentLine.dataset.portraitAsset || '';  // data-portrait-asset → dataset.portraitAsset
+portraitImg.src = url;
+```
+
+### 配置媒体联动
+
+在 UGC 编辑器的变量管理器中，找到该变量，点击"联动素材库"，配置素材选项：
+
+- **默认素材**（`is_default: true`）：变量值为空或无匹配时使用
+- **条件素材**：当某个变量满足条件时使用，支持 `==`、`!=`、`contains`、`in`
+
+引擎渲染优先级：变量值已是 URL → 精确匹配 asset_id → 满足条件的素材 → 默认素材 → 空 URL。
+
+典型用法：根据全局变量（如当前大奖赛）自动切换背景图，在变量管理器里为 `gp_bg_asset` 配置多个条件素材即可。
 
 ---
 
