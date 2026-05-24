@@ -67,7 +67,7 @@ def _build_response_format_toml(data: dict) -> str:
     lines = ["# 响应格式", "[response_format]"]
     lines.append(f"example = {_toml_str(data['example'])}")
     if "format_note" in data:
-        lines.append(f'format_note = "{data["format_note"]}"')
+        lines.append(f"format_note = {_toml_str(data['format_note'])}")
     lines.append("")
     lines.extend(_build_nested_layer(data["nested_extraction"], "response_format.nested_extraction"))
     return "\n".join(lines)
