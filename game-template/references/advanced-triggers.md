@@ -110,6 +110,35 @@
 }
 ```
 
+## append_context：注入上下文消息
+
+把一条消息定格为对话历史的一部分，以玩家侧（user）角色注入后续所有 AI 调用的上下文，**本身不发起 AI 请求**。消息会持久化在触发它的 state 上，之后的清屏、变量清空都不影响它。
+
+```json
+{
+  "action_id": "inject-rent-event",
+  "action_type": "append_context",
+  "action_order": 1,
+  "action_params": {
+    "context_message": {
+      "content": "【事件】三天过去了，房租账单已寄到。当前好感度：{{affection}}"
+    }
+  }
+}
+```
+
+**规则**：
+- `content` 与 `update_variable` 的 `variable_value` 同规则求值（宏 / `{{变量}}`），变量在**上下文组装时**解析为当时的值
+- 同一个 action sequence 可以放多条 `append_context`，按 `action_order` 顺序进入历史
+- 消息在历史中排在同一 state 的用户输入（`user_input`）**之前**
+- 与 `trigger_ai_response` 同序列使用时，把 `append_context` 排在前面，本次 AI 调用即可看到该消息
+- 可用于 `html_event`、`variable_condition`、`on_load` 触发器；**preload 中被引擎忽略并告警**（preload 每次渲染都执行，放行会导致每回合重复注入）
+- 注入的消息同样参与长期记忆总结，不会在历史被总结后丢失
+
+**典型场景**：on_load 注入"进入新章节/时间流逝"事件、点击道具后注入"（玩家使用了 X）"、变量条件达成时注入剧情转折旁白。
+
+**不要再用旧 workaround**（给 `user_input` 赋值但不触发 AI）：`user_input` 是每次渲染边界都会被清空的工作寄存器，且重复的常量值会被残留检测丢弃，静态事件第二次注入会失败。
+
 ## `replace` 与内嵌 JavaScript 的兼容性
 
 `replacement_type: "replace"` 会把目标元素**整个节点**替换成新节点，导致：

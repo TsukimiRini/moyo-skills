@@ -255,7 +255,7 @@ event_type = "click"         # click | keypress | change | submit
 element_selector = "#btn-id"
 
 [[triggers.action_sequence]]
-action_type = "update_variable"   # update_variable | trigger_ai_response | jump_interface
+action_type = "update_variable"   # update_variable | trigger_ai_response | jump_interface | append_context
 action_order = 1
 
 [[triggers.action_sequence.action_params.variable_updates]]
@@ -290,6 +290,21 @@ action_order = 2
 **页面加载**：`trigger_condition: { "type": "on_load" }`，action 为 `trigger_ai_response`。
 
 **跳转界面**：`action_type: "jump_interface"`，`action_params: { "target_template_id": "目标模板id" }`。
+
+**注入上下文事件**（`append_context`）：把一条消息定格为对话历史的一部分，注入后续 AI 调用的上下文，但**不发起 AI 请求**。适合静态剧情事件（时间流逝、账单寄到、场景切换旁白）：
+
+```toml
+[[triggers.action_sequence]]
+action_type = "append_context"
+action_order = 1
+
+[triggers.action_sequence.action_params.context_message]
+content = "【事件】三天过去了，房租账单已寄到。"
+```
+
+- `content` 支持 `{{变量}}` 替换与宏求值
+- 可用于 `on_load` 和 `html_event` 触发器；**preload 中会被引擎忽略**（preload 每次渲染都执行，会重复注入）
+- 不要用"给 `user_input` 赋值但不触发 AI"的旧写法注入事件——那是工作寄存器，不是历史存档
 
 > 条件执行（`__execution_condition`）、expression 模式变量更新、变量条件触发器、`replace` 与 JS 兼容性等高级用法见 `references/advanced-triggers.md`。
 
